@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <vTrafficLight :routeContext="routeContext" />
+    <vTrafficLight :routeContext="routeContext" :totalTicks="totalTicks" :toRedirect="toRedirect"/>
   </div>
 </template>
 <script>
@@ -11,6 +11,14 @@ export default {
       type: String,
       required: true,
     },
+    totalTicks:{
+      type:Number,
+      required:true
+    },
+    toRedirect:{
+      type: String,
+      required: true,
+    }
   },
   components: {
     vTrafficLight,

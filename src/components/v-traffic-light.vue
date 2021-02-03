@@ -23,6 +23,7 @@
       </svg>
     </div>
     <vTimer :ticksRemain="ticksRemain" />
+    <!-- Связываю оставшиеся количество секунд с таймером-->
   </div>
 </template>
 
@@ -33,94 +34,85 @@ export default {
     vTimer,
   },
   props: {
-    routeContext: {
+    routeContext: {   //Компонент принимает пропсы с роутера
       type: String,
       default: "red",
     },
+    totalTicks:{
+      type:Number,
+      required:true
+    },
+    toRedirect:{
+      type: String,
+      required: true,
+    }
   },
   methods:{
-    ticking(){
+    ticking(){         //Рекурсивная функция отсчета времени
       if (this.ticksRemain > 0) {
-        if (this.ticksRemain <= 4) {
+        if (this.ticksRemain <= 4) { //Если осталось меньше 3-ех секунд(равно 3-секундам будет происходит в промежутке 3 -> 2 секунды, а это меньше 3) Происходит добавление класса для мерцания света
           this.flickering = true;
         }
-          localStorage.setItem("savedTick", this.ticksRemain);
-          this.ticksRemain--;
-          setTimeout(()=>this.ticking(),1000)
-      }else{
-          this.$router.push(`/${this.redirectTo}`);
+          sessionStorage.setItem("savedTick", this.ticksRemain); //Текущая секунда сохраняет в sessionStorage для корректной работы с того же места при перезагрузке(Решение сохранять в сессионое хранилище, а не в локальное потому что если бы были открыты несколько окон они бы перезаписывали значения друг другу)
+          this.ticksRemain--; // Cнижение оставщихся секунд на 1
+          setTimeout(()=>this.ticking(),1000) 
+      }else{          
+          this.$router.push(`/${this.redirectTo}`);// При окончании времени происходит редирект на следующую страницу
       }
     }
   },
-  computed: {
-    totalTimeTick: function () {
-      let time;
-      switch (this.routeContext) {
-        case "red":
-          time = 10;
-          break;
-        case "yellow":
-          time = 3;
-          break;
-        case "green":
-          time = 15;
-          break;
-        default:
-          break;
-      }
-      return time;
-    },
-    redirectTo: function () {
-      let to;
-      switch (this.routeContext) {
-        case "red":
-          to = "yellow";
-          break;
-        case "yellow":
-          to = localStorage.getItem("from") === "green" ? "red" : "green";
-          break;
-        case "green":
-          to = "yellow";
-          break;
-        default:
-          break;
-      }
+  computed: {       //Вычисляемые свойства
+    // totalTimeTick: function () { // Общее время для каждого цвета определяющееся в зависмости от роута //Подумал, что стоит вынести это тоже в пропсы от роута чтобы увеличить гибкость компонента
+    //   let time;
+    //   switch (this.routeContext) {  
+    //     case "red":
+    //       time = 10;
+    //       break;
+    //     case "yellow":
+    //       time = 3;
+    //       break;
+    //     case "green":
+    //       time = 15;
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    //   return time;
+    // },
+    redirectTo: function () { //Вычисление следущего роута
+      let to = this.toRedirect!='needToComputed'?this.toRedirect:sessionStorage.getItem("from") === "green" ? "red" : "green"
       return to;
     },
   },
   data() {
     return {
-      ticksRemain:
-        this.routeContext == localStorage.getItem("savedLight")
-          ? localStorage.getItem("savedTick")
-          : null,
-      flickering: false,
-      from: localStorage.getItem("from"),
+      ticksRemain:this.routeContext == sessionStorage.getItem("savedLight")? sessionStorage.getItem("savedTick"): null, //Количесвто оставшихся тиков если оно сохранилось в локальном хранилище и при совпадении с текущим роутом
+      flickering: false,  // Мигание для <3 секунд
+      from: sessionStorage.getItem("from"), // Прошлый роут для определния куда пойти после желтого цвета
     };
   },
   created() {
-    this.ticksRemain =
-      this.ticksRemain === null ? this.totalTimeTick : this.ticksRemain;
-    localStorage.setItem("savedLight", this.routeContext);
-    if (this.routeContext != "yellow") {
-      localStorage.setItem("from", this.routeContext);
+    this.ticksRemain = this.ticksRemain === null ? this.totalTicks : this.ticksRemain; // если же в локальном хранилище нет сохраннего тика(с совпадением роута) ставится максимально возможное время для текущего цвета
+    sessionStorage.setItem("savedLight", this.routeContext); //Сохранение текущего цвета(для валидации при перезагрузке страницы(если прошлый цвет сопадает с сохраненным))
+    if (this.routeContext != "yellow") { //Сохранение в локальное хранилище с какого конца идет цикл(если не в середине цикла)
+      sessionStorage.setItem("from", this.routeContext); 
     }
   },
   mounted() {
-    // let tiking = setInterval(() => {
+    // let tiking = setInterval(() => {   //Не самое удачно решение потому что отсчет времени начинается спустя секунду
     //   if (this.ticksRemain > 0) {
     //     console.log(this.ticksRemain);
     //     if (this.ticksRemain <= 4) {
     //       this.flickering = true;
     //     }
     //     this.ticksRemain--;
-    //     localStorage.setItem('savedTick',this.ticksRemain)
+    //     localStorage.setItem('savedTick',this.ticksRemain) 
     //   } else {
     //     this.$router.push(`/${this.redirectTo}`);
     //     clearInterval(tiking);
     //   }
     // }, 1000);
-    setTimeout(()=> {
+    setTimeout(()=> {          //Предполагаю, что для реализации отсчета времени это оптимальный вариант
       this.ticking(1000)
     },0);
   },
@@ -187,7 +179,7 @@ export default {
         fill-opacity: 0.2;
       }
       100% {
-        fill-opacity: 0.2;
+        fill-opacity: 1;
       }
     }
   }
