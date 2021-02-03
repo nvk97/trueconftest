@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import Red from  '../views/Red'
+import Yellow from  '../views/Yellow'
+import Green from  '../views/Green'
+
 
 Vue.use(VueRouter)
 
@@ -11,15 +15,21 @@ const routes = [
     component: Home
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/About.vue')
-    }
-  }
+    path:'/red',
+    component: Red,
+    props:{routeContext:'red'}   // Передаю через пропсы контекст роутера(Мне кажется это более гибким решением нежели запрашивать этот контекст из компонента)
+  },
+  {
+    path:'/yellow',
+    component: Yellow,
+    props:{routeContext:'yellow'}  // Передаю через пропсы контекст роутера(Мне кажется это более гибким решением нежели запрашивать этот контекст из компонента)
+  },
+  {
+    path:'/green',
+    component: Green,
+    props:{routeContext:'green'}  // Передаю через пропсы контекст роутера(Мне кажется это более гибким решением нежели запрашивать этот контекст из компонента)
+  },
+
 ]
 
 const router = new VueRouter({
