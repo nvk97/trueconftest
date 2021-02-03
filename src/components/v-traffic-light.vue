@@ -1,6 +1,14 @@
 <template>
   <div class="traffic">
-    <div class="traffic-light" :class="{redLightOn: routeContext == 'red', yellowLightOn: routeContext == 'yellow', greenLightOn: routeContext == 'green', flickering: flickering,}">
+    <div
+      class="traffic-light"
+      :class="{
+        redLightOn: routeContext == 'red',
+        yellowLightOn: routeContext == 'yellow',
+        greenLightOn: routeContext == 'green',
+        flickering: flickering,
+      }"
+    >
       <svg
         width="120"
         height="300"
@@ -27,8 +35,22 @@ export default {
   props: {
     routeContext: {
       type: String,
-      required: true,
+      default: "red",
     },
+  },
+  methods:{
+    ticking(){
+      if (this.ticksRemain > 0) {
+        if (this.ticksRemain <= 4) {
+          this.flickering = true;
+        }
+          localStorage.setItem("savedTick", this.ticksRemain);
+          this.ticksRemain--;
+          setTimeout(()=>this.ticking(),1000)
+      }else{
+          this.$router.push(`/${this.redirectTo}`);
+      }
+    }
   },
   computed: {
     totalTimeTick: function () {
@@ -68,32 +90,39 @@ export default {
   },
   data() {
     return {
-      ticksRemain:this.routeContext == localStorage.getItem("savedLight") ? localStorage.getItem("savedTick"): null,
+      ticksRemain:
+        this.routeContext == localStorage.getItem("savedLight")
+          ? localStorage.getItem("savedTick")
+          : null,
       flickering: false,
       from: localStorage.getItem("from"),
     };
   },
   created() {
-    this.ticksRemain = this.ticksRemain === null ? this.totalTimeTick : this.ticksRemain;
-    localStorage.setItem('savedLight',this.routeContext)
+    this.ticksRemain =
+      this.ticksRemain === null ? this.totalTimeTick : this.ticksRemain;
+    localStorage.setItem("savedLight", this.routeContext);
     if (this.routeContext != "yellow") {
       localStorage.setItem("from", this.routeContext);
     }
   },
   mounted() {
-    let tiking = setInterval(() => {
-      if (this.ticksRemain > 0) {
-        console.log(this.ticksRemain);
-        if (this.ticksRemain <= 4) {
-          this.flickering = true;
-        }
-        this.ticksRemain--;
-        localStorage.setItem('savedTick',this.ticksRemain)
-      } else {
-        this.$router.push(`/${this.redirectTo}`);
-        clearInterval(tiking);
-      }
-    }, 1000);
+    // let tiking = setInterval(() => {
+    //   if (this.ticksRemain > 0) {
+    //     console.log(this.ticksRemain);
+    //     if (this.ticksRemain <= 4) {
+    //       this.flickering = true;
+    //     }
+    //     this.ticksRemain--;
+    //     localStorage.setItem('savedTick',this.ticksRemain)
+    //   } else {
+    //     this.$router.push(`/${this.redirectTo}`);
+    //     clearInterval(tiking);
+    //   }
+    // }, 1000);
+    setTimeout(()=> {
+      this.ticking(1000)
+    },0);
   },
 };
 </script>
