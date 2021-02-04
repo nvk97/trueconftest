@@ -36,13 +36,13 @@ export default {
   props: {
     routeContext: {   //Компонент принимает пропсы с роутера
       type: String,
-      default: "red",
+      default: "red", //Параметры роута
     },
     totalTicks:{
       type:Number,
-      required:true
+      required:true //Общее время для каждого роута
     },
-    toRedirect:{
+    toRedirect:{    //Следующий редирект
       type: String,
       required: true,
     }
@@ -61,7 +61,7 @@ export default {
       }
     }
   },
-  computed: {       //Вычисляемые свойства
+  computed: {       //Вычисляемые переменные
     // totalTimeTick: function () { // Общее время для каждого цвета определяющееся в зависмости от роута //Подумал, что стоит вынести это тоже в пропсы от роута чтобы увеличить гибкость компонента
     //   let time;
     //   switch (this.routeContext) {  
@@ -92,7 +92,7 @@ export default {
     };
   },
   created() {
-    this.ticksRemain = this.ticksRemain === null ? this.totalTicks : this.ticksRemain; // если же в локальном хранилище нет сохраннего тика(с совпадением роута) ставится максимально возможное время для текущего цвета
+    this.ticksRemain = this.ticksRemain === null ? this.totalTicks : this.ticksRemain; // если же в сессионом хранилище нет сохраннего тика(с совпадением роута) ставится максимально возможное время для текущего цвета
     sessionStorage.setItem("savedLight", this.routeContext); //Сохранение текущего цвета(для валидации при перезагрузке страницы(если прошлый цвет сопадает с сохраненным))
     if (this.routeContext != "yellow") { //Сохранение в локальное хранилище с какого конца идет цикл(если не в середине цикла)
       sessionStorage.setItem("from", this.routeContext); 
