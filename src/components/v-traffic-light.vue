@@ -61,34 +61,12 @@ export default {
       }
     }
   },
-  computed: {       //Вычисляемые переменные
-    // totalTimeTick: function () { // Общее время для каждого цвета определяющееся в зависмости от роута //Подумал, что стоит вынести это тоже в пропсы от роута чтобы увеличить гибкость компонента
-    //   let time;
-    //   switch (this.routeContext) {  
-    //     case "red":
-    //       time = 10;
-    //       break;
-    //     case "yellow":
-    //       time = 3;
-    //       break;
-    //     case "green":
-    //       time = 15;
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    //   return time;
-    // },
-    redirectTo: function () { //Вычисление следущего роута
-      let to = this.toRedirect!='needToComputed'?this.toRedirect:sessionStorage.getItem("from") === "green" ? "red" : "green"
-      return to;
-    },
-  },
   data() {
     return {
       ticksRemain:this.routeContext == sessionStorage.getItem("savedLight")? sessionStorage.getItem("savedTick"): null, //Количесвто оставшихся тиков если оно сохранилось в локальном хранилище и при совпадении с текущим роутом
       flickering: false,  // Мигание для <3 секунд
       from: sessionStorage.getItem("from"), // Прошлый роут для определния куда пойти после желтого цвета
+      redirectTo:this.toRedirect!='needToComputed'?this.toRedirect:sessionStorage.getItem("from") === "green" ? "red" : "green"
     };
   },
   created() {
